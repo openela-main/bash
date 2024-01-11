@@ -1,0 +1,23 @@
+diff -up bash-4.4/input.c.orig bash-4.4/input.c
+--- bash-4.4/input.c.orig	2022-03-10 10:50:40.046490589 -0300
++++ bash-4.4/input.c	2022-03-10 10:51:48.659491601 -0300
+@@ -530,7 +530,7 @@ bufstream_ungetc(c, bp)
+      int c;
+      BUFFERED_STREAM *bp;
+ {
+-  if (c == EOF || bp->b_inputp == 0)
++  if (c == EOF || bp == 0 || bp->b_inputp == 0)
+     return (EOF);
+ 
+   bp->b_buffer[--bp->b_inputp] = c;
+@@ -561,6 +561,10 @@ buffered_getchar ()
+ {
+   CHECK_TERMSIG;
+ 
++  if (bash_input.location.buffered_fd < 0 ||
++      buffers[bash_input.location.buffered_fd] == 0)
++    return EOF;
++
+ #if !defined (DJGPP)
+   return (bufstream_getc (buffers[bash_input.location.buffered_fd]));
+ #else
